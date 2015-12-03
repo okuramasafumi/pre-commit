@@ -22,7 +22,13 @@ module PreCommit
       def call(staged_files)
         require 'rubocop'
       rescue LoadError => e
-        $stderr.puts "Could not find rubocop: #{e}"
+        if defined?(Bundler)
+          require 'rubygems'
+          require 'bundler/setup'
+          retry
+        else
+          $stderr.puts "Could not find rubocop: #{e}"
+        end
       else
         staged_files = filter_staged_files(staged_files)
         return if staged_files.empty?
